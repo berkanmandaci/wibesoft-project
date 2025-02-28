@@ -21,6 +21,7 @@ namespace WibeSoft.Core.Bootstrap
         public static event Action<int> OnMoneyChanged;
         public static event Action<string, int> OnInventoryItemChanged;
         public static event Action<int, int, int> OnPlayerLevelChanged;
+        public static event Action<int, int> OnCurrencyChanged;
 
         // Grid Events
         public static event Action<Vector2Int> OnCellSelected;
@@ -132,6 +133,12 @@ namespace WibeSoft.Core.Bootstrap
         {
             OnPlayerLevelChanged?.Invoke(level, currentExp, maxExp);
             Debug.Log($"Player Level Changed event triggered: Level {level}, Exp: {currentExp}/{maxExp}");
+        }
+
+        public static void TriggerCurrencyChanged(int gold, int gem)
+        {
+            OnCurrencyChanged?.Invoke(gold, gem);
+            Debug.Log($"Currency Changed event triggered: Gold {gold}, Gem {gem}");
         }
 
         #endregion

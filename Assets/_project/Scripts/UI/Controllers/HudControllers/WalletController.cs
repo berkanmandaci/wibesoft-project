@@ -3,49 +3,36 @@ using WibeSoft.Core.Bootstrap;
 using WibeSoft.Core.Managers;
 using WibeSoft.UI.Views.HudViews;
 
-namespace WibeSoft.UI.Controllers
+namespace WibeSoft.UI.Controllers.HudControllers
 {
     public class WalletController : MonoBehaviour
     {
-        [SerializeField] private WalletContainerView _walletView;
+        [SerializeField] private WalletContainerView _walletContainerView;
         
-        private InventoryManager _inventoryManager => InventoryManager.Instance;
+        private PlayerManager _playerManager => PlayerManager.Instance;
         private LogManager _logger => LogManager.Instance;
 
         private void OnEnable()
         {
-            GameEvents.OnMoneyChanged += HandleMoneyChanged;
-            GameEvents.OnInventoryItemChanged += HandleInventoryItemChanged;
-            
-            UpdateWalletView();
+            GameEvents.OnCurrencyChanged += HandleCurrencyChanged;
         }
 
         private void OnDisable()
         {
-            GameEvents.OnMoneyChanged -= HandleMoneyChanged;
-            GameEvents.OnInventoryItemChanged -= HandleInventoryItemChanged;
+            GameEvents.OnCurrencyChanged -= HandleCurrencyChanged;
         }
 
-        private void HandleMoneyChanged(int amount)
+        private void HandleCurrencyChanged(int gold, int gem)
         {
             UpdateWalletView();
-            _logger.LogInfo($"Money updated: {amount}", "WalletController");
+            _logger.LogInfo($"Wallet updated: Gold: {gold}, Gem: {gem}", "WalletController");
         }
 
-        private void HandleInventoryItemChanged(string itemId, int amount)
+        public void UpdateWalletView()
         {
-            if (itemId.ToLower() == "gem")
-            {
-                UpdateWalletView();
-                _logger.LogInfo($"Gems updated: {amount}", "WalletController");
-            }
-        }
-
-        private void UpdateWalletView()
-        {
-            var coins = _inventoryManager.GetItemAmount("coin");
-            var gems = _inventoryManager.GetItemAmount("gem");
-            _walletView.Init(coins, gems);
+            var gold = _playerManager.PlayerData.Currency.Gold;
+            var gem = _playerManager.PlayerData.Currency.Gem;
+            _walletContainerView.Init(gold, gem);
         }
     }
 } 

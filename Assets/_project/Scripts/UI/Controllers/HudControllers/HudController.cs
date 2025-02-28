@@ -1,42 +1,19 @@
 using UnityEngine;
+using Cysharp.Threading.Tasks;
+using WibeSoft.Core.Singleton;
 using WibeSoft.Core.Managers;
 using WibeSoft.Core.Bootstrap;
-using WibeSoft.Core.Singleton;
-using Cysharp.Threading.Tasks;
-using WibeSoft.UI.Controllers.HudControllers;
 
-namespace WibeSoft.UI.Controllers
+namespace WibeSoft.UI.Controllers.HudControllers
 {
     public class HudController : SingletonBehaviour<HudController>
     {
-        [Header("HUD References")]
-        [SerializeField] private LevelContainerController _levelContainer;
+        [Header("Sub Controllers")]
+        [SerializeField] private LevelContainerController _levelContainerController;
+        [SerializeField] private WalletController _walletController;
 
         private PlayerManager _playerManager => PlayerManager.Instance;
         private LogManager _logger => LogManager.Instance;
-
-        public async UniTask Initialize()
-        {
-            _logger.LogInfo("Initializing HUD...", "HudController");
-            
-            if (_levelContainer != null)
-            {
-                InitializeLevelContainer();
-            }
-            else
-            {
-                _logger.LogWarning("Level container reference is missing!", "HudController");
-            }
-
-            await UniTask.CompletedTask;
-        }
-
-        private void InitializeLevelContainer()
-        {
-            var playerData = _playerManager.PlayerData;
-            _levelContainer.UpdateView(playerData.MaxExp, playerData.CurrentExp, playerData.Level, playerData.Username);
-            _logger.LogInfo("Level container initialized", "HudController");
-        }
 
         private void OnEnable()
         {
@@ -50,27 +27,63 @@ namespace WibeSoft.UI.Controllers
 
         private void SubscribeToEvents()
         {
-            GameEvents.OnPlayerLevelChanged += HandlePlayerLevelChanged;
             GameEvents.OnGameReady += HandleGameReady;
         }
 
         private void UnsubscribeFromEvents()
         {
-            GameEvents.OnPlayerLevelChanged -= HandlePlayerLevelChanged;
             GameEvents.OnGameReady -= HandleGameReady;
+        }
+
+        public async UniTask Initialize()
+        {
+            _logger.LogInfo("Initializing HUD Controller", "HudController");
+
+            if (_levelContainerController == null)
+            {
+                _logger.LogError("LevelContainerController reference is missing!", "HudController");
+                return;
+            }
+
+            if (_walletController == null)
+            {
+                _logger.LogError("WalletController reference is missing!", "HudController");
+                return;
+            }
+
+            await InitializeSubControllers();
+            _logger.LogInfo("HUD Controller initialized", "HudController");
+        }
+
+        private async UniTask InitializeSubControllers()
+        {
+            try
+            {
+                // Level Container başlatma
+                var playerData = _playerManager.PlayerData;
+                _levelContainerController.UpdateView(
+                    playerData.MaxExp,
+                    playerData.CurrentExp,
+                    playerData.Level,
+                    playerData.Username
+                );
+
+                // Wallet başlatma
+                _walletController.UpdateWalletView();
+
+                _logger.LogInfo("Sub-controllers initialized successfully", "HudController");
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError($"Error initializing sub-controllers: {ex.Message}", "HudController");
+                throw;
+            }
         }
 
         private void HandleGameReady()
         {
-            InitializeLevelContainer();
-        }
-
-        private void HandlePlayerLevelChanged(int level, int currentExp, int maxExp)
-        {
-            if (_levelContainer != null)
-            {
-                _levelContainer.UpdateView(maxExp, currentExp, level, _playerManager.PlayerData.Username);
-            }
+            _logger.LogInfo("Game ready event received, refreshing HUD", "HudController");
+            InitializeSubControllers().Forget();
         }
     }
 } 

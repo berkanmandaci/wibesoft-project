@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using WibeSoft.Core.Bootstrap;
 using Cysharp.Threading.Tasks;
 using WibeSoft.Core.Singleton;
+using WibeSoft.Data.Models;
 
 namespace WibeSoft.Core.Managers
 {
@@ -13,46 +14,67 @@ namespace WibeSoft.Core.Managers
         public async UniTask Initialize()
         {
             _inventory.Clear();
-            _logger.LogInfo("InventoryManager initialized", "InventoryManager");
+            _logger.LogInfo("Initializing InventoryManager", "InventoryManager");
             await UniTask.CompletedTask;
+            _logger.LogInfo("InventoryManager initialized", "InventoryManager");
         }
 
-        public void AddItem(string itemType, int amount)
+        public async UniTask LoadData(Dictionary<string, InventoryItemSaveData> items)
         {
-            if (!_inventory.ContainsKey(itemType))
+            _logger.LogInfo("Loading inventory data", "InventoryManager");
+
+            _inventory.Clear();
+            foreach (var item in items)
             {
-                _inventory[itemType] = new InventoryItem { Amount = 0, Value = GetItemBaseValue(itemType) };
+                _inventory[item.Key] = new InventoryItem
+                {
+                    Amount = item.Value.Amount,
+                    Value = item.Value.Value
+                };
             }
 
-            _inventory[itemType].Amount += amount;
-            _logger.LogInfo($"Added {amount} {itemType} to inventory. New total: {_inventory[itemType].Amount}", "InventoryManager");
-
-            GameEvents.TriggerInventoryItemChanged(itemType, _inventory[itemType].Amount);
+            _logger.LogInfo("Inventory data loaded", "InventoryManager");
         }
 
-        public bool RemoveItem(string itemType, int amount)
+        public void AddItem(string itemId, int amount, int value)
         {
-            if (_inventory.TryGetValue(itemType, out InventoryItem item))
+            if (_inventory.ContainsKey(itemId))
             {
-                if (item.Amount >= amount)
-                {
-                    item.Amount -= amount;
-                    _logger.LogInfo($"Removed {amount} {itemType} from inventory. Remaining: {item.Amount}", "InventoryManager");
-
-                    GameEvents.TriggerInventoryItemChanged(itemType, item.Amount);
-                    return true;
-                }
-                else
-                {
-                    _logger.LogWarning($"Not enough {itemType} in inventory. Required: {amount}, Available: {item.Amount}", "InventoryManager");
-                }
+                _inventory[itemId].Amount += amount;
             }
             else
             {
-                _logger.LogWarning($"Item {itemType} not found in inventory", "InventoryManager");
+                _inventory[itemId] = new InventoryItem
+                {
+                    Amount = amount,
+                    Value = value
+                };
             }
 
-            return false;
+            _logger.LogInfo($"Added {amount} {itemId} to inventory", "InventoryManager");
+        }
+
+        public bool RemoveItem(string itemId, int amount)
+        {
+            if (!_inventory.ContainsKey(itemId) || _inventory[itemId].Amount < amount)
+            {
+                _logger.LogWarning($"Insufficient {itemId} amount", "InventoryManager");
+                return false;
+            }
+
+            _inventory[itemId].Amount -= amount;
+            if (_inventory[itemId].Amount <= 0)
+            {
+                _inventory.Remove(itemId);
+            }
+
+            _logger.LogInfo($"Removed {amount} {itemId} from inventory", "InventoryManager");
+            return true;
+        }
+
+        public Dictionary<string, InventoryItem> GetAllItems()
+        {
+            return new Dictionary<string, InventoryItem>(_inventory);
         }
 
         public int GetItemAmount(string itemType)

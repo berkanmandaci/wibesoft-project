@@ -22,17 +22,7 @@ namespace WibeSoft.UI.Controllers.HudControllers
             GameEvents.OnPlayerLevelChanged -= HandlePlayerLevelChanged;
         }
 
-        private void Start()
-        {
-            InitializeLevelContainer();
-        }
-
-        private void InitializeLevelContainer()
-        {
-            var playerData = _playerManager.PlayerData;
-            UpdateView(playerData.MaxExp, playerData.CurrentExp, playerData.Level, playerData.Username);
-        }
-
+        
         private void HandlePlayerLevelChanged(int level, int currentExp, int maxExp)
         {
             UpdateView(maxExp, currentExp, level, _playerManager.PlayerData.Username);

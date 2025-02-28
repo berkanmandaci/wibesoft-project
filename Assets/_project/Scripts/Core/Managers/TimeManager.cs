@@ -1,19 +1,20 @@
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using WibeSoft.Core.Singleton;
+using System;
 
 namespace WibeSoft.Core.Managers
 {
     public class TimeManager : SingletonBehaviour<TimeManager>
     {
-        private float _lastSaveTime;
         private LogManager _logger => LogManager.Instance;
+        private JsonDataService _jsonDataService => JsonDataService.Instance;
 
         public async UniTask Initialize()
         {
-            _lastSaveTime = Time.time;
-            _logger.LogInfo("TimeManager initialized", "TimeManager");
+            _logger.LogInfo("Initializing TimeManager", "TimeManager");
             await UniTask.CompletedTask;
+            _logger.LogInfo("TimeManager initialized", "TimeManager");
         }
 
         public void UpdateGameTime()
@@ -21,11 +22,11 @@ namespace WibeSoft.Core.Managers
             _logger.LogInfo("Updating game time...", "TimeManager");
         }
 
-        public float GetOfflineTime()
+        public TimeSpan GetOfflineTime()
         {
-            var currentTime = Time.time;
-            var offlineTime = currentTime - _lastSaveTime;
-            _logger.LogInfo($"Offline time: {offlineTime} seconds", "TimeManager");
+            var lastSaveTime = _jsonDataService.GetAllData().LastSaveTime;
+            var offlineTime = DateTime.Now - lastSaveTime;
+            _logger.LogInfo($"Offline time: {offlineTime.TotalSeconds} seconds", "TimeManager");
             return offlineTime;
         }
     }

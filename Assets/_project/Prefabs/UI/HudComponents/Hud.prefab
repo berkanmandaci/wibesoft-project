@@ -214,7 +214,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9326af7c57791014aba36849df767f0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _levelContainer: {fileID: 2440766097517731114}
+  _levelContainerController: {fileID: 2440766097517731114}
+  _walletController: {fileID: 3710275756605240582}
 --- !u!1 &2955873088754298942
 GameObject:
   m_ObjectHideFlags: 0
@@ -1008,6 +1009,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cd88028c22345d14bbbe4946dcbb632d, type: 3}
+--- !u!114 &3710275756605240582 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4946609946071203821, guid: cd88028c22345d14bbbe4946dcbb632d, type: 3}
+  m_PrefabInstance: {fileID: 8635775075088206571}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09aaa8e0a62aab3418232e168d461018, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &9154776366219096285 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 636172157712300598, guid: cd88028c22345d14bbbe4946dcbb632d, type: 3}

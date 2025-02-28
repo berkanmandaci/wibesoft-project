@@ -1,19 +1,23 @@
 using UnityEngine;
 using System.Collections.Generic;
 using WibeSoft.Core.Singleton;
+using WibeSoft.Data.Models;
+using System.Linq;
 
 namespace WibeSoft.Core.Managers
 {
     public class GridManager : SingletonBehaviour<GridManager>
     {
         private Dictionary<Vector2Int, GameObject> _grid = new Dictionary<Vector2Int, GameObject>();
+        private Dictionary<Vector2Int, Cell> _cells = new Dictionary<Vector2Int, Cell>();
         private GameObject _cellPrefab;
-        private LogManager _logger=> LogManager.Instance;
-
+        private LogManager _logger => LogManager.Instance;
 
         public void InitializeGrid(int width, int height, GameObject cellPrefab)
         {
             _cellPrefab = cellPrefab;
+            _grid.Clear();
+            _cells.Clear();
 
             for (int x = 0; x < width; x++)
             {
@@ -28,25 +32,50 @@ namespace WibeSoft.Core.Managers
 
         private void CreateCell(Vector2Int position)
         {
-            var cell = Instantiate(_cellPrefab, new Vector3(position.x, 0, position.y), Quaternion.identity);
-            cell.transform.parent = transform;
-            _grid[position] = cell;
+            var cell = new Cell(position.x, position.y);
+            var cellObject = Instantiate(_cellPrefab, new Vector3(position.x, 0, position.y), Quaternion.identity);
+            cellObject.transform.parent = transform;
+            
+            _grid[position] = cellObject;
+            _cells[position] = cell;
+            
             _logger.LogInfo($"Cell created at position: {position}", "GridManager");
         }
 
-        public GameObject GetCell(Vector2Int position)
+        public Cell GetCell(int x, int y)
         {
-            if (_grid.TryGetValue(position, out GameObject cell))
-            {
-                return cell;
-            }
-            _logger.LogWarning($"No cell found at position: {position}", "GridManager");
-            return null;
+            var position = new Vector2Int(x, y);
+            return _cells.TryGetValue(position, out Cell cell) ? cell : null;
+        }
+
+        public GameObject GetCellObject(Vector2Int position)
+        {
+            return _grid.TryGetValue(position, out GameObject cellObject) ? cellObject : null;
         }
 
         public bool IsCellOccupied(Vector2Int position)
         {
-            return _grid.ContainsKey(position);
+            return _cells.ContainsKey(position);
+        }
+
+        public IEnumerable<Cell> GetAllCells()
+        {
+            return _cells.Values;
+        }
+
+        public void ClearGrid()
+        {
+            foreach (var cellObject in _grid.Values)
+            {
+                if (cellObject != null)
+                {
+                    Destroy(cellObject);
+                }
+            }
+
+            _grid.Clear();
+            _cells.Clear();
+            _logger.LogInfo("Grid cleared", "GridManager");
         }
     }
 } 

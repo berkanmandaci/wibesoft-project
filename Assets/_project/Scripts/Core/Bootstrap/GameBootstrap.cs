@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using WibeSoft.Core.Managers;
 using WibeSoft.Core.Singleton;
+using WibeSoft.Data.Models;
 
 namespace WibeSoft.Core.Bootstrap
 {
@@ -49,6 +50,9 @@ namespace WibeSoft.Core.Bootstrap
                 // PoolManager
                 await PoolManager.Instance.Initialize();
 
+                // JsonDataService
+                await JsonDataService.Instance.Initialize();
+
                 // AudioManager
                 var audioManager = AudioManager.Instance;
 
@@ -70,14 +74,14 @@ namespace WibeSoft.Core.Bootstrap
 
             try
             {
+                // JsonDataService initialization
+                await JsonDataService.Instance.Initialize();
+
                 // ScriptableObject configs
                 await LoadConfigurations();
 
-                // Save data
-                var saveData = await LoadSaveData();
-
-                // Player data
-                await InitializePlayerData(saveData);
+                // Player Manager initialization
+                await PlayerManager.Instance.Initialize();
 
                 _logger.LogInfo("Data loaded successfully", "Bootstrap");
             }
@@ -137,19 +141,6 @@ namespace WibeSoft.Core.Bootstrap
             await UniTask.CompletedTask;
         }
 
-        private async UniTask<SaveData> LoadSaveData()
-        {
-            // TODO: Load save data
-            await UniTask.CompletedTask;
-            return new SaveData();
-        }
-
-        private async UniTask InitializePlayerData(SaveData saveData)
-        {
-            // TODO: Initialize player data
-            await UniTask.CompletedTask;
-        }
-
         private async UniTask HandleBootstrapError(Exception ex)
         {
             _logger.LogError($"Bootstrap error caught: {ex.Message}", "Bootstrap");
@@ -199,6 +190,4 @@ namespace WibeSoft.Core.Bootstrap
         {
         }
     }
-
-    public class SaveData { }
 }
