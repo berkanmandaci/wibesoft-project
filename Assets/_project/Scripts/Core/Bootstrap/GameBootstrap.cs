@@ -115,6 +115,9 @@ namespace WibeSoft.Core.Bootstrap
 
             try
             {
+                // Crop service
+                await CropService.Instance.Initialize();
+
                 // Grid system
                 await GridManager.Instance.Initialize();
 

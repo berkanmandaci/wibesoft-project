@@ -3,6 +3,7 @@ using WibeSoft.Core.Bootstrap;
 using Cysharp.Threading.Tasks;
 using WibeSoft.Core.Singleton;
 using WibeSoft.Data.Models;
+using UnityEngine;
 
 namespace WibeSoft.Core.Managers
 {
@@ -10,12 +11,24 @@ namespace WibeSoft.Core.Managers
     {
         private Dictionary<string, InventoryItem> _inventory = new Dictionary<string, InventoryItem>();
         private LogManager _logger => LogManager.Instance;
+        private JsonDataService _jsonDataService => JsonDataService.Instance;
+
+        public event System.Action<string, InventoryItem> OnItemUpdated;
+        public event System.Action<string> OnItemRemoved;
+        public event System.Action OnInventoryCleared;
 
         public async UniTask Initialize()
         {
             _inventory.Clear();
             _logger.LogInfo("Initializing InventoryManager", "InventoryManager");
-            await UniTask.CompletedTask;
+            
+            // Load inventory data from JSON
+            var saveData = _jsonDataService.GetInventoryData();
+            if (saveData != null && saveData.Items != null)
+            {
+                await LoadData(saveData.Items);
+            }
+            
             _logger.LogInfo("InventoryManager initialized", "InventoryManager");
         }
 
@@ -24,20 +37,31 @@ namespace WibeSoft.Core.Managers
             _logger.LogInfo("Loading inventory data", "InventoryManager");
 
             _inventory.Clear();
+            OnInventoryCleared?.Invoke();
+
             foreach (var item in items)
             {
                 _inventory[item.Key] = new InventoryItem
                 {
+                    ItemId = item.Key,
                     Amount = item.Value.Amount,
-                    Value = item.Value.Value
+                    Value = item.Value.Value,
                 };
+                OnItemUpdated?.Invoke(item.Key, _inventory[item.Key]);
             }
 
             _logger.LogInfo("Inventory data loaded", "InventoryManager");
         }
+        
 
         public void AddItem(string itemId, int amount, int value)
         {
+            if (amount <= 0)
+            {
+                _logger.LogWarning($"Cannot add negative or zero amount: {amount}", "InventoryManager");
+                return;
+            }
+
             if (_inventory.ContainsKey(itemId))
             {
                 _inventory[itemId].Amount += amount;
@@ -46,30 +70,70 @@ namespace WibeSoft.Core.Managers
             {
                 _inventory[itemId] = new InventoryItem
                 {
+                    ItemId = itemId,
                     Amount = amount,
-                    Value = value
+                    Value = value,
                 };
             }
 
+            OnItemUpdated?.Invoke(itemId, _inventory[itemId]);
             _logger.LogInfo($"Added {amount} {itemId} to inventory", "InventoryManager");
+
+            // Save to JSON
+            SaveInventoryData().Forget();
         }
 
         public bool RemoveItem(string itemId, int amount)
         {
-            if (!_inventory.ContainsKey(itemId) || _inventory[itemId].Amount < amount)
+            if (!_inventory.ContainsKey(itemId))
+            {
+                _logger.LogWarning($"Item not found in inventory: {itemId}", "InventoryManager");
+                return false;
+            }
+
+            if (_inventory[itemId].Amount < amount)
             {
                 _logger.LogWarning($"Insufficient {itemId} amount", "InventoryManager");
                 return false;
             }
 
             _inventory[itemId].Amount -= amount;
+            
             if (_inventory[itemId].Amount <= 0)
             {
                 _inventory.Remove(itemId);
+                OnItemRemoved?.Invoke(itemId);
+            }
+            else
+            {
+                OnItemUpdated?.Invoke(itemId, _inventory[itemId]);
             }
 
             _logger.LogInfo($"Removed {amount} {itemId} from inventory", "InventoryManager");
+            
+            // Save to JSON
+            SaveInventoryData().Forget();
             return true;
+        }
+
+        private async UniTask SaveInventoryData()
+        {
+            var saveData = new InventorySaveData
+            {
+                Items = new Dictionary<string, InventoryItemSaveData>()
+            };
+
+            foreach (var item in _inventory)
+            {
+                saveData.Items[item.Key] = new InventoryItemSaveData
+                {
+                    Amount = item.Value.Amount,
+                    Value = item.Value.Value
+                };
+            }
+
+            await _jsonDataService.SaveInventoryData(saveData);
+            _logger.LogInfo("Inventory data saved", "InventoryManager");
         }
 
         public Dictionary<string, InventoryItem> GetAllItems()
@@ -77,20 +141,19 @@ namespace WibeSoft.Core.Managers
             return new Dictionary<string, InventoryItem>(_inventory);
         }
 
-        public int GetItemAmount(string itemType)
+        public InventoryItem GetItem(string itemId)
         {
-            return _inventory.TryGetValue(itemType, out InventoryItem item) ? item.Amount : 0;
+            return _inventory.TryGetValue(itemId, out InventoryItem item) ? item : null;
         }
 
-        public int GetItemValue(string itemType)
+        public int GetItemAmount(string itemId)
         {
-            return _inventory.TryGetValue(itemType, out InventoryItem item) ? item.Value : 0;
+            return _inventory.TryGetValue(itemId, out InventoryItem item) ? item.Amount : 0;
         }
-    }
 
-    public class InventoryItem
-    {
-        public int Amount { get; set; }
-        public int Value { get; set; }
+        public int GetItemValue(string itemId)
+        {
+            return _inventory.TryGetValue(itemId, out InventoryItem item) ? item.Value : 0;
+        }
     }
 } 

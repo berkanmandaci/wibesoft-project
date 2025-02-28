@@ -2,6 +2,7 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using WibeSoft.Core.Managers;
 using WibeSoft.Data.Models;
+using WibeSoft.Core.Bootstrap;
 
 namespace WibeSoft.Features.Grid
 {
@@ -30,6 +31,7 @@ namespace WibeSoft.Features.Grid
         public CellType Type { get; private set; }
         public CellState State { get; private set; }
         public bool IsSelected => _isSelected;
+        public Vector2Int Position { get; private set; }
 
         private void OnValidate()
         {
@@ -41,18 +43,35 @@ namespace WibeSoft.Features.Grid
         private void Awake()
         {
             _outline = GetComponent<Outline>();
-            // _outline = gameObject.AddComponent<Outline>();
-            // _outline.OutlineMode = Outline.Mode.OutlineAll;
-            // _outline.OutlineColor = Color.yellow;
-            // _outline.OutlineWidth = 5f;
-            // _outline.enabled = false;
+            // Tıklama için BoxCollider ekle
+            if (_collider == null)
+            {
+                _collider = gameObject.AddComponent<BoxCollider>();
+                _collider.size = new Vector3(1.8f, 0.1f, 1.8f); // Grid spacing'e göre ayarla
+            }
         }
 
-        public async UniTask Initialize(int x, int y, Material defaultMaterial, Mesh waterMesh, Mesh groundMesh, Mesh farmMesh)
+        public void SetSelected(bool selected)
+        {
+            _isSelected = selected;
+            _outline.enabled = selected;
+            
+            // Seçildiğinde ve ekim yapılabilir durumdaysa ekim isteği tetikle
+            if (selected && Type == CellType.Farm && State == CellState.Empty)
+            {
+                _logger.LogInfo($"Planting requested at cell {Position}", "Cell");
+                GameEvents.TriggerPlantingRequested(Position);
+            }
+            
+            _logger.LogInfo($"Cell ({X}, {Y}) selection state changed to {selected}", "Cell");
+        }
+
+        public async UniTask Initialize(int x, int y, Material defaultMaterial, Mesh waterMesh, Mesh groundMesh, Mesh farmMesh, CellType type = CellType.Ground)
         {
             X = x;
             Y = y;
-            Type = CellType.Ground;
+            Position = new Vector2Int(x, y);
+            Type = type;
             State = CellState.Empty;
 
             // Store references
@@ -63,7 +82,7 @@ namespace WibeSoft.Features.Grid
 
             await SetupComponents();
             
-            _logger.LogInfo($"Cell initialized at position ({X}, {Y})", "Cell");
+            _logger.LogInfo($"Cell initialized at position ({X}, {Y}) with type {Type}", "Cell");
         }
 
         private async UniTask SetupComponents()
@@ -86,13 +105,6 @@ namespace WibeSoft.Features.Grid
             // _collider.center = new Vector3(0f, 0.05f, 0f);
             
             await UniTask.CompletedTask;
-        }
-
-        public void SetSelected(bool selected)
-        {
-            _isSelected = selected;
-            _outline.enabled = selected;
-            _logger.LogInfo($"Cell ({X}, {Y}) selection state changed to {selected}", "Cell");
         }
 
         public async UniTask LoadFromData(CellSaveData data)

@@ -136,6 +136,43 @@ namespace WibeSoft.Core.Managers
 
         private SaveData CreateNewSaveData()
         {
+            var cells = new List<CellSaveData>();
+            
+            // Calculate center points for 10x10 grid
+            int centerX = 10 / 2;
+            int centerY = 10 / 2;
+            
+            // Create grid with 10x10 size
+            for (int x = 0; x < 10; x++)
+            {
+                for (int y = 0; y < 10; y++)
+                {
+                    var cell = new CellSaveData
+                    {
+                        X = x,
+                        Y = y,
+                        Type = "Ground",
+                        State = "Empty"
+                    };
+                    
+                    // Set 6 cells in the center as farm area (2x3)
+                    if (x >= centerX - 1 && x <= centerX && 
+                        y >= centerY - 1 && y <= centerY + 1)
+                    {
+                        cell.Type = "Farm";
+                    }
+                    
+                    cells.Add(cell);
+                }
+            }
+
+            // Create initial inventory items
+            var inventoryItems = new Dictionary<string, InventoryItemSaveData>
+            {
+                ["Carrot"] = new InventoryItemSaveData { Amount = 10, Value = 100 },
+                ["Corn"] = new InventoryItemSaveData { Amount = 10, Value = 150 }
+            };
+
             return new SaveData
             {
                 PlayerData = new PlayerSaveData
@@ -144,16 +181,16 @@ namespace WibeSoft.Core.Managers
                     CurrentExp = 0,
                     Level = 1,
                     Username = "Player",
-                    Gold = 1000,
-                    Gem = 10
+                    Gold = 10000,
+                    Gem = 100
                 },
                 GridData = new GridSaveData
                 {
-                    Cells = new List<CellSaveData>()
+                    Cells = cells
                 },
                 InventoryData = new InventorySaveData
                 {
-                    Items = new Dictionary<string, InventoryItemSaveData>()
+                    Items = inventoryItems
                 },
                 LastSaveTime = DateTime.Now
             };

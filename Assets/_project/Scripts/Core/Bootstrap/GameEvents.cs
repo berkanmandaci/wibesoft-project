@@ -28,10 +28,13 @@ namespace WibeSoft.Core.Bootstrap
         public static event Action<Vector2Int, string> OnCropPlanted;
         public static event Action<Vector2Int> OnCropHarvested;
         public static event Action<Vector2Int, string> OnCropStateChanged;
+        public static event Action<Vector2Int> OnPlantingRequested;
 
         // UI Events
         public static event Action OnInventoryOpened;
         public static event Action OnInventoryClosed;
+        public static event Action OnPopupClosed;
+        public static event Action OnPopupOpened;
 
         // Save Events
         public static event Action OnGameSaved;
@@ -105,6 +108,12 @@ namespace WibeSoft.Core.Bootstrap
             Debug.Log($"Crop State Changed event triggered: {state} at {position}");
         }
 
+        public static void TriggerPlantingRequested(Vector2Int position)
+        {
+            OnPlantingRequested?.Invoke(position);
+            Debug.Log($"Planting Requested event triggered at {position}");
+        }
+
         public static void TriggerInventoryOpened()
         {
             OnInventoryOpened?.Invoke();
@@ -116,6 +125,17 @@ namespace WibeSoft.Core.Bootstrap
             OnInventoryClosed?.Invoke();
             Debug.Log("Inventory Closed event triggered");
         }
+        public static void TriggerClosePopup()
+        {
+            OnPopupClosed?.Invoke();
+            Debug.Log("Popup Closed event triggered");
+        }
+        public static void TriggerOpenPopup()
+        {
+            OnPopupOpened?.Invoke();
+            Debug.Log("Popup Closed event triggered");
+        }
+        
 
         public static void TriggerGameSaved()
         {
