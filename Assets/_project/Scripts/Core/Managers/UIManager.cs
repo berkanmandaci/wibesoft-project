@@ -1,6 +1,7 @@
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using WibeSoft.Core.Singleton;
+using WibeSoft.UI.Controllers;
 
 namespace WibeSoft.Core.Managers
 {
@@ -10,9 +11,8 @@ namespace WibeSoft.Core.Managers
         private GameObject _currentPanel;
         private LogManager _logger => LogManager.Instance;
 
-        public UniTask Initialize()
+        public async UniTask Initialize()
         {
-
             // Create main canvas if not exists
             if (_mainCanvas == null)
             {
@@ -24,8 +24,11 @@ namespace WibeSoft.Core.Managers
                 _mainCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
                 _logger.LogInfo("Main canvas created", "UIManager");
             }
+
+            // Initialize HUD Controller
+            await HudController.Instance.Initialize();
             
-            return UniTask.CompletedTask;
+            return;
         }
 
         public void ShowPanel(GameObject panelPrefab)

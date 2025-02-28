@@ -52,6 +52,9 @@ namespace WibeSoft.Core.Bootstrap
                 // AudioManager
                 var audioManager = AudioManager.Instance;
 
+                // PlayerManager
+                await PlayerManager.Instance.Initialize();
+
                 _logger.LogInfo("Core systems initialized", "Bootstrap");
             }
             catch (Exception ex)

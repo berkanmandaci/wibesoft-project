@@ -286,10 +286,6 @@ PrefabInstance:
       value: 123
       objectReference: {fileID: 0}
     - target: {fileID: 7460454848165025220, guid: 6360e6b41878d0f44ab16a8a9e942513, type: 3}
-      propertyPath: m_characterSpacing
-      value: -8
-      objectReference: {fileID: 0}
-    - target: {fileID: 7460454848165025220, guid: 6360e6b41878d0f44ab16a8a9e942513, type: 3}
       propertyPath: m_VerticalAlignment
       value: 256
       objectReference: {fileID: 0}

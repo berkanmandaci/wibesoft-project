@@ -20,6 +20,7 @@ namespace WibeSoft.Core.Bootstrap
         // Player Events
         public static event Action<int> OnMoneyChanged;
         public static event Action<string, int> OnInventoryItemChanged;
+        public static event Action<int, int, int> OnPlayerLevelChanged;
 
         // Grid Events
         public static event Action<Vector2Int> OnCellSelected;
@@ -125,6 +126,12 @@ namespace WibeSoft.Core.Bootstrap
         {
             OnGameLoaded?.Invoke();
             Debug.Log("Game Loaded event triggered");
+        }
+
+        public static void TriggerPlayerLevelChanged(int level, int currentExp, int maxExp)
+        {
+            OnPlayerLevelChanged?.Invoke(level, currentExp, maxExp);
+            Debug.Log($"Player Level Changed event triggered: Level {level}, Exp: {currentExp}/{maxExp}");
         }
 
         #endregion
