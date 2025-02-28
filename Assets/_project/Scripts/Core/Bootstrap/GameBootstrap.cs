@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using System;
-using WibeSoft.Core.DI;
 using WibeSoft.Core.Managers;
 using WibeSoft.Core.Singleton;
 
@@ -11,7 +10,7 @@ namespace WibeSoft.Core.Bootstrap
     /// </summary>
     public class GameBootstrap : SingletonBehaviour<GameBootstrap>
     {
-        private LogManager _logger;
+        private LogManager _logger => LogManager.Instance;
 
         private void Start()
         {
@@ -42,28 +41,16 @@ namespace WibeSoft.Core.Bootstrap
             
             try
             {
-                // LogManager
-                _logger = LogManager.Instance;
-                ServiceLocator.RegisterService(_logger);
                 _logger.LogInfo("Initializing core systems...", "Bootstrap");
 
-                // SaveManager
-                var saveManager = SaveManager.Instance;
-                ServiceLocator.RegisterService(saveManager);
-
                 // TimeManager
-                var timeManager = TimeManager.Instance;
-                ServiceLocator.RegisterService(timeManager);
-                await timeManager.Initialize();
+                await TimeManager.Instance.Initialize();
 
                 // PoolManager
-                var poolManager = PoolManager.Instance;
-                ServiceLocator.RegisterService(poolManager);
-                await poolManager.Initialize();
+                await PoolManager.Instance.Initialize();
 
                 // AudioManager
                 var audioManager = AudioManager.Instance;
-                ServiceLocator.RegisterService(audioManager);
 
                 _logger.LogInfo("Core systems initialized", "Bootstrap");
             }
@@ -105,9 +92,7 @@ namespace WibeSoft.Core.Bootstrap
             try
             {
                 // UI Manager
-                var uiManager = UIManager.Instance;
-                ServiceLocator.RegisterService(uiManager);
-                await uiManager.Initialize();
+                await UIManager.Instance.Initialize();
 
                 _logger.LogInfo("UI initialized", "Bootstrap");
             }
@@ -126,17 +111,12 @@ namespace WibeSoft.Core.Bootstrap
             {
                 // Grid system
                 var gridManager = GridManager.Instance;
-                ServiceLocator.RegisterService(gridManager);
 
                 // Farming system
-                var farmingManager = FarmingManager.Instance;
-                ServiceLocator.RegisterService(farmingManager);
-                await farmingManager.Initialize();
+                await FarmingManager.Instance.Initialize();
 
                 // Inventory system
-                var inventoryManager = InventoryManager.Instance;
-                ServiceLocator.RegisterService(inventoryManager);
-                await inventoryManager.Initialize();
+                await InventoryManager.Instance.Initialize();
 
                 _logger.LogInfo("Gameplay systems initialized", "Bootstrap");
             }
@@ -171,9 +151,6 @@ namespace WibeSoft.Core.Bootstrap
         {
             _logger.LogError($"Bootstrap error caught: {ex.Message}", "Bootstrap");
 
-            // Clean up critical systems
-            await CleanupSystems();
-
             // Show error screen
             await ShowErrorScreen(ex.Message);
 
@@ -183,12 +160,6 @@ namespace WibeSoft.Core.Bootstrap
                 await UniTask.DelayFrame(60); // Wait for 1 second
                 await RetryBootstrap();
             }
-        }
-
-        private async UniTask CleanupSystems()
-        {
-            DIContainer.Instance.Clear();
-            await UniTask.CompletedTask;
         }
 
         private async UniTask ShowErrorScreen(string message)
