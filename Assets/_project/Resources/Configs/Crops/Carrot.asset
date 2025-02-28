@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21914806e5ed8e6409e017bbd8270e15, type: 3}
+  m_Name: Carrot
+  m_EditorClassIdentifier: 
+  _cropId: carrot
+  _cropName: Carrot
+  _cropIcon: {fileID: 1265006350145721774, guid: 7d8da65b2084aaa4aac249e466b93794, type: 3}
+  _purchasePrice: 10
+  _sellPrice: 60
+  _growthTime: 60
+  _growthStages: 3
+  _growthStageMeshes:
+  - {fileID: 2002715036992664983, guid: 1eb9800696136e9448656ad38f4e574b, type: 3}
+  - {fileID: 2683140368571956053, guid: fd823b02d4dab724085a0d07af8bca70, type: 3}
+  - {fileID: -8808425536343626755, guid: ede85317fc77cd540835fa5a9e4e7938, type: 3}
+  _cropMaterial: {fileID: 3977926055095282242, guid: e0d136a1dd3e95d4fae769134e3c5536, type: 3}
+  _plantEffect: {fileID: 0}
+  _growthEffect: {fileID: 0}
+  _harvestEffect: {fileID: 0}
+  _plantSound: {fileID: 0}
+  _growthSound: {fileID: 0}
+  _harvestSound: {fileID: 0}

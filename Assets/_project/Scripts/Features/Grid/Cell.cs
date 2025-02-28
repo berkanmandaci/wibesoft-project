@@ -13,11 +13,15 @@ namespace WibeSoft.Features.Grid
     {
         [SerializeField] private MeshFilter _meshFilter;
         [SerializeField] private MeshRenderer _meshRenderer;
+        [SerializeField] private BoxCollider _collider;
         
-        private Material _material;
+        private Material _defaultMaterial;
+        private Material _selectedMaterial;
         private Mesh _waterMesh;
         private Mesh _groundMesh;
         private Mesh _farmMesh;
+        private bool _isSelected;
+        private Outline _outline;
         
         private LogManager _logger => LogManager.Instance;
 
@@ -25,22 +29,34 @@ namespace WibeSoft.Features.Grid
         public int Y { get; private set; }
         public CellType Type { get; private set; }
         public CellState State { get; private set; }
+        public bool IsSelected => _isSelected;
 
         private void OnValidate()
         {
             if (_meshFilter == null) _meshFilter = GetComponent<MeshFilter>();
             if (_meshRenderer == null) _meshRenderer = GetComponent<MeshRenderer>();
+            if (_collider == null) _collider = GetComponent<BoxCollider>();
         }
 
-        public async UniTask Initialize(int x, int y, Material material, Mesh waterMesh, Mesh groundMesh, Mesh farmMesh)
+        private void Awake()
+        {
+            _outline = GetComponent<Outline>();
+            // _outline = gameObject.AddComponent<Outline>();
+            // _outline.OutlineMode = Outline.Mode.OutlineAll;
+            // _outline.OutlineColor = Color.yellow;
+            // _outline.OutlineWidth = 5f;
+            // _outline.enabled = false;
+        }
+
+        public async UniTask Initialize(int x, int y, Material defaultMaterial, Mesh waterMesh, Mesh groundMesh, Mesh farmMesh)
         {
             X = x;
             Y = y;
             Type = CellType.Ground;
             State = CellState.Empty;
 
-            // Store mesh references
-            _material = material;
+            // Store references
+            _defaultMaterial = defaultMaterial;
             _waterMesh = waterMesh;
             _groundMesh = groundMesh;
             _farmMesh = farmMesh;
@@ -53,19 +69,30 @@ namespace WibeSoft.Features.Grid
         private async UniTask SetupComponents()
         {
             // Validate components
-            if (_meshFilter == null || _meshRenderer == null)
+            if (_meshFilter == null || _meshRenderer == null || _collider == null)
             {
                 _logger.LogError($"Required components missing on cell ({X}, {Y})", "Cell");
                 throw new System.Exception("Required components missing on cell!");
             }
 
             // Set material
-            _meshRenderer.sharedMaterial = _material;
+            _meshRenderer.sharedMaterial = _defaultMaterial;
             
             // Set default mesh
             await SwitchToGround();
             
+            // // Setup collider
+            // _collider.size = new Vector3(1f, 0.1f, 1f);
+            // _collider.center = new Vector3(0f, 0.05f, 0f);
+            
             await UniTask.CompletedTask;
+        }
+
+        public void SetSelected(bool selected)
+        {
+            _isSelected = selected;
+            _outline.enabled = selected;
+            _logger.LogInfo($"Cell ({X}, {Y}) selection state changed to {selected}", "Cell");
         }
 
         public async UniTask LoadFromData(CellSaveData data)

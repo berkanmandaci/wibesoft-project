@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21914806e5ed8e6409e017bbd8270e15, type: 3}
+  m_Name: Corn
+  m_EditorClassIdentifier: 
+  _cropId: corn
+  _cropName: Corn
+  _cropIcon: {fileID: 4600256173882806731, guid: 3047d07e4a3021946a6442651b84d68b, type: 3}
+  _purchasePrice: 10
+  _sellPrice: 200
+  _growthTime: 300
+  _growthStages: 3
+  _growthStageMeshes:
+  - {fileID: -8612331713570730465, guid: af0214e2c30de37469f058c1f283390b, type: 3}
+  - {fileID: -1943403125659669755, guid: 2f0a733783fca674aa6e5f20b8a5d25e, type: 3}
+  - {fileID: -2974290685690536183, guid: d6f308466e480b448a166e6b08a99e3b, type: 3}
+  _cropMaterial: {fileID: 3977926055095282242, guid: e0d136a1dd3e95d4fae769134e3c5536, type: 3}
+  _plantEffect: {fileID: 0}
+  _growthEffect: {fileID: 0}
+  _harvestEffect: {fileID: 0}
+  _plantSound: {fileID: 0}
+  _growthSound: {fileID: 0}
+  _harvestSound: {fileID: 0}
