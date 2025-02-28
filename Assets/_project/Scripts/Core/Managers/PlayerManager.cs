@@ -15,7 +15,7 @@ namespace WibeSoft.Core.Managers
         public async UniTask Initialize()
         {
             _logger = LogManager.Instance;
-            _logger.LogInfo("PlayerManager başlatılıyor", "PlayerManager");
+            _logger.LogInfo("Initializing PlayerManager", "PlayerManager");
 
             var playerData = JsonDataService.Instance.GetPlayerData();
             PlayerData = new PlayerData(
@@ -27,7 +27,7 @@ namespace WibeSoft.Core.Managers
                 playerData.Gem
             );
 
-            _logger.LogInfo("PlayerManager başlatıldı", "PlayerManager");
+            _logger.LogInfo("PlayerManager initialized", "PlayerManager");
         }
 
         public async UniTask LoadData(int maxExp, int currentExp, int level, string username)
@@ -102,7 +102,7 @@ namespace WibeSoft.Core.Managers
         {
             if (PlayerData.AddGold(amount))
             {
-                _logger.LogInfo($"{amount} gold eklendi. Yeni toplam: {PlayerData.Currency.Gold}", "PlayerManager");
+                _logger.LogInfo($"Added {amount} gold. New total: {PlayerData.Currency.Gold}", "PlayerManager");
                 GameEvents.TriggerCurrencyChanged(PlayerData.Currency.Gold, PlayerData.Currency.Gem);
                 
                 // Save the changes
@@ -116,7 +116,7 @@ namespace WibeSoft.Core.Managers
         {
             if (PlayerData.RemoveGold(amount))
             {
-                _logger.LogInfo($"{amount} gold silindi. Yeni toplam: {PlayerData.Currency.Gold}", "PlayerManager");
+                _logger.LogInfo($"Removed {amount} gold. New total: {PlayerData.Currency.Gold}", "PlayerManager");
                 GameEvents.TriggerCurrencyChanged(PlayerData.Currency.Gold, PlayerData.Currency.Gem);
                 
                 // Save the changes
@@ -130,7 +130,7 @@ namespace WibeSoft.Core.Managers
         {
             if (PlayerData.AddGem(amount))
             {
-                _logger.LogInfo($"{amount} gem eklendi. Yeni toplam: {PlayerData.Currency.Gem}", "PlayerManager");
+                _logger.LogInfo($"Added {amount} gems. New total: {PlayerData.Currency.Gem}", "PlayerManager");
                 GameEvents.TriggerCurrencyChanged(PlayerData.Currency.Gold, PlayerData.Currency.Gem);
                 
                 // Save the changes
@@ -144,7 +144,7 @@ namespace WibeSoft.Core.Managers
         {
             if (PlayerData.RemoveGem(amount))
             {
-                _logger.LogInfo($"{amount} gem silindi. Yeni toplam: {PlayerData.Currency.Gem}", "PlayerManager");
+                _logger.LogInfo($"Removed {amount} gems. New total: {PlayerData.Currency.Gem}", "PlayerManager");
                 GameEvents.TriggerCurrencyChanged(PlayerData.Currency.Gold, PlayerData.Currency.Gem);
                 
                 // Save the changes

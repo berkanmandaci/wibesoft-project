@@ -59,7 +59,6 @@ namespace WibeSoft.UI.Controllers.HudControllers
         {
             try
             {
-                // Level Container başlatma
                 var playerData = _playerManager.PlayerData;
                 _levelContainerController.UpdateView(
                     playerData.MaxExp,
@@ -68,10 +67,10 @@ namespace WibeSoft.UI.Controllers.HudControllers
                     playerData.Username
                 );
 
-                // Wallet başlatma
                 _walletController.UpdateWalletView();
 
                 _logger.LogInfo("Sub-controllers initialized successfully", "HudController");
+                await UniTask.CompletedTask;
             }
             catch (System.Exception ex)
             {

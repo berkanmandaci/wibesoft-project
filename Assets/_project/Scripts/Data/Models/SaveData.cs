@@ -26,16 +26,15 @@ namespace WibeSoft.Data.Models
     [Serializable]
     public class GridSaveData
     {
-        public List<CropSaveData> Crops { get; set; }
+        public List<CellSaveData> Cells { get; set; }
     }
 
     [Serializable]
-    public class CropSaveData
+    public class CellSaveData
     {
         public int X { get; set; }
         public int Y { get; set; }
         public string Type { get; set; }
-        public float PlantTime { get; set; }
         public string State { get; set; }
     }
 

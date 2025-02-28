@@ -2,7 +2,6 @@ using Cysharp.Threading.Tasks;
 using System;
 using WibeSoft.Core.Managers;
 using WibeSoft.Core.Singleton;
-using WibeSoft.Data.Models;
 
 namespace WibeSoft.Core.Bootstrap
 {
@@ -117,10 +116,7 @@ namespace WibeSoft.Core.Bootstrap
             try
             {
                 // Grid system
-                var gridManager = GridManager.Instance;
-
-                // Farming system
-                await FarmingManager.Instance.Initialize();
+                await GridManager.Instance.Initialize();
 
                 // Inventory system
                 await InventoryManager.Instance.Initialize();

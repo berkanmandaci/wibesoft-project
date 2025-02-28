@@ -149,7 +149,7 @@ namespace WibeSoft.Core.Managers
                 },
                 GridData = new GridSaveData
                 {
-                    Crops = new List<CropSaveData>()
+                    Cells = new List<CellSaveData>()
                 },
                 InventoryData = new InventorySaveData
                 {

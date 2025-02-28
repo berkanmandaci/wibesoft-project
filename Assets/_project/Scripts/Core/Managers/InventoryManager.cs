@@ -86,18 +86,6 @@ namespace WibeSoft.Core.Managers
         {
             return _inventory.TryGetValue(itemType, out InventoryItem item) ? item.Value : 0;
         }
-
-        private int GetItemBaseValue(string itemType)
-        {
-            // This should be replaced with actual configuration values
-            switch (itemType.ToLower())
-            {
-                case "wheat":
-                    return 100;
-                default:
-                    return 50;
-            }
-        }
     }
 
     public class InventoryItem
