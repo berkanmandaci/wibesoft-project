@@ -36,6 +36,10 @@ namespace WibeSoft.Data.Models
         public int Y { get; set; }
         public string Type { get; set; }
         public string State { get; set; }
+        public string CropId { get; set; }
+        public DateTime PlantedTime { get; set; }
+        public float GrowthProgress { get; set; }
+        public string CropState { get; set; }
     }
 
     [Serializable]

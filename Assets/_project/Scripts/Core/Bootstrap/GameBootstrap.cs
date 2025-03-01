@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using WibeSoft.Core.Managers;
 using WibeSoft.Core.Singleton;
+using UnityEngine;
 
 namespace WibeSoft.Core.Bootstrap
 {
@@ -15,6 +16,71 @@ namespace WibeSoft.Core.Bootstrap
         private void Start()
         {
             Init().Forget();
+        }
+
+        private void OnEnable()
+        {
+            SubscribeToEvents();
+        }
+
+        private void OnDisable()
+        {
+            UnsubscribeFromEvents();
+        }
+
+        private void SubscribeToEvents()
+        {
+            GameEvents.OnGameQuit += HandleGameQuit;
+            GameEvents.OnCropPlanted += HandleCropPlanted;
+            GameEvents.OnCropHarvested += HandleCropHarvested;
+            GameEvents.OnCropStateChanged += HandleCropStateChanged;
+        }
+
+        private void UnsubscribeFromEvents()
+        {
+            GameEvents.OnGameQuit -= HandleGameQuit;
+            GameEvents.OnCropPlanted -= HandleCropPlanted;
+            GameEvents.OnCropHarvested -= HandleCropHarvested;
+            GameEvents.OnCropStateChanged -= HandleCropStateChanged;
+        }
+
+        private async void HandleGameQuit()
+        {
+            await SaveAllGameData();
+            _logger.LogInfo("Game data saved on quit", "GameBootstrap");
+        }
+
+        private async void HandleCropPlanted(Vector2Int position, string cropId)
+        {
+            await SaveAllGameData();
+            _logger.LogInfo("Game data saved after planting", "GameBootstrap");
+        }
+
+        private async void HandleCropHarvested(Vector2Int position)
+        {
+            await SaveAllGameData();
+            _logger.LogInfo("Game data saved after harvesting", "GameBootstrap");
+        }
+
+        private async void HandleCropStateChanged(Vector2Int position, string state)
+        {
+            await SaveAllGameData();
+            _logger.LogInfo("Game data saved after crop state change", "GameBootstrap");
+        }
+
+        private async UniTask SaveAllGameData()
+        {
+            try
+            {
+                await GridManager.Instance.SaveGridData();
+                await InventoryManager.Instance.SaveInventoryData();
+                await PlayerManager.Instance.SavePlayerData();
+                GameEvents.TriggerGameSaved();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error saving game data: {ex.Message}", "GameBootstrap");
+            }
         }
 
         private async UniTask Init()

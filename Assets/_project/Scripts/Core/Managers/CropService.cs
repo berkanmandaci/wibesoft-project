@@ -27,6 +27,11 @@ namespace WibeSoft.Core.Managers
             }
             await UniTask.CompletedTask;
         }
+        public CropConfig GetCropConfig(string cropId)
+        {
+            var crop = _database.GetCropById(cropId);
+            return crop;
+        }
 
         public Sprite GetCropIcon(string cropId)
         {
@@ -127,5 +132,6 @@ namespace WibeSoft.Core.Managers
 
             return false;
         }
+       
     }
 } 

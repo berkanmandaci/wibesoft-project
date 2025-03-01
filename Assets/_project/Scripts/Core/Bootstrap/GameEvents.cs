@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using WibeSoft.Features.Grid;
 
 namespace WibeSoft.Core.Bootstrap
 {
@@ -24,11 +25,24 @@ namespace WibeSoft.Core.Bootstrap
         public static event Action<int, int> OnCurrencyChanged;
 
         // Grid Events
-        public static event Action<Vector2Int> OnCellSelected;
+        public static event Action<Cell> OnCellSelected;
         public static event Action<Vector2Int, string> OnCropPlanted;
         public static event Action<Vector2Int> OnCropHarvested;
         public static event Action<Vector2Int, string> OnCropStateChanged;
-        public static event Action<Vector2Int> OnPlantingRequested;
+        public static event Action<Cell> OnPlantingRequested;
+        public static event Action<Cell> OnCropInfoPopup;
+        public static event Action<Cell> OnHarvestPopup;
+
+        // Planting Events
+        public static event Action<string> OnInventoryItemSelected;
+        
+        public static event Action<string> OnPlanting;
+        public static event Action OnPlantingModeStarted;
+        public static event Action OnPlantingModeEnded;
+        public static event Action<Vector2Int> OnValidCellHovered;
+        public static event Action<Vector2Int> OnInvalidCellHovered;
+        public static event Action<Vector2Int, string> OnPlantingStarted;
+        public static event Action<string> OnPlantingFailed;
 
         // UI Events
         public static event Action OnInventoryOpened;
@@ -84,7 +98,13 @@ namespace WibeSoft.Core.Bootstrap
             Debug.Log($"Inventory Item Changed event triggered: {itemId} = {amount}");
         }
 
-        public static void TriggerCellSelected(Vector2Int position)
+        public static void TriggerInventoryItemSelected(string itemId)
+        {
+            OnInventoryItemSelected?.Invoke(itemId);
+            Debug.Log($"Inventory Item Selected event triggered: {itemId}");
+        }
+
+        public static void TriggerCellSelected(Cell position)
         {
             OnCellSelected?.Invoke(position);
             Debug.Log($"Cell Selected event triggered: {position}");
@@ -108,10 +128,19 @@ namespace WibeSoft.Core.Bootstrap
             Debug.Log($"Crop State Changed event triggered: {state} at {position}");
         }
 
-        public static void TriggerPlantingRequested(Vector2Int position)
+        public static void TriggerPlantingRequested(Cell cell)
         {
-            OnPlantingRequested?.Invoke(position);
-            Debug.Log($"Planting Requested event triggered at {position}");
+            OnPlantingRequested?.Invoke(cell);
+            Debug.Log($"Planting requested at position: {cell}");
+        }
+        public static void TriggerCropInfoPopup(Cell cell)
+        {
+            OnCropInfoPopup?.Invoke(cell);
+        }
+        
+        public static void TriggerHarvestPopup(Cell cell)
+        {
+            OnHarvestPopup?.Invoke(cell);
         }
 
         public static void TriggerInventoryOpened()
@@ -160,7 +189,46 @@ namespace WibeSoft.Core.Bootstrap
             OnCurrencyChanged?.Invoke(gold, gem);
             Debug.Log($"Currency Changed event triggered: Gold {gold}, Gem {gem}");
         }
+        
+
+        public static void TriggerPlanting(string cropId)
+        {
+            OnPlanting?.Invoke(cropId);
+            Debug.Log("Planting");
+        }
+        public static void TriggerPlantingModeStarted()
+        {
+            OnPlantingModeStarted?.Invoke();
+            Debug.Log("Planting mode started");
+        }
+
+        public static void TriggerPlantingModeEnded()
+        {
+            OnPlantingModeEnded?.Invoke();
+            Debug.Log("Planting mode ended");
+        }
+
+        public static void TriggerValidCellHovered(Vector2Int position)
+        {
+            OnValidCellHovered?.Invoke(position);
+        }
+
+        public static void TriggerInvalidCellHovered(Vector2Int position)
+        {
+            OnInvalidCellHovered?.Invoke(position);
+        }
+
+    
+
+        public static void TriggerPlantingFailed(string reason)
+        {
+            OnPlantingFailed?.Invoke(reason);
+            Debug.Log($"Planting failed: {reason}");
+        }
 
         #endregion
+
+
+       
     }
 } 

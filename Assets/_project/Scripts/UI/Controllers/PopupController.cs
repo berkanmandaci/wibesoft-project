@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using WibeSoft.Core.Bootstrap;
+using WibeSoft.Core.Managers;
 namespace WibeSoft.UI.Controllers
 {
     public class PopupController : MonoBehaviour
@@ -19,6 +20,7 @@ namespace WibeSoft.UI.Controllers
         private void OnPopupOpened()
         {
             gameObject.SetActive(true);
+            UIManager.Instance.IsPopupOpen=true;
         }
 
 
@@ -26,6 +28,7 @@ namespace WibeSoft.UI.Controllers
         {
             GameEvents.TriggerClosePopup();
             gameObject.SetActive(false);
+            UIManager.Instance.IsPopupOpen=false;
         }
     }
 }

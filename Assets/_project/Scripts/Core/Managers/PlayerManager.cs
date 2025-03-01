@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using WibeSoft.Core.Singleton;
@@ -152,6 +153,11 @@ namespace WibeSoft.Core.Managers
                 saveData.Gem = PlayerData.Currency.Gem;
                 JsonDataService.Instance.SavePlayerData(saveData).Forget();
             }
+        }
+        public async Task SavePlayerData()
+        {
+            var saveData = JsonDataService.Instance.GetPlayerData();
+            JsonDataService.Instance.SavePlayerData(saveData).Forget();
         }
     }
 } 

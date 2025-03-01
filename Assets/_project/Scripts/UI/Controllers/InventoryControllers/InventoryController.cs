@@ -4,6 +4,7 @@ using WibeSoft.Core.Managers;
 using WibeSoft.Data.Models;
 using WibeSoft.UI.Views.InventoryViews;
 using WibeSoft.Core.Bootstrap;
+using WibeSoft.Features.Grid;
 
 namespace WibeSoft.UI.Controllers.InventoryControllers
 {
@@ -60,9 +61,10 @@ namespace WibeSoft.UI.Controllers.InventoryControllers
             GameEvents.OnPopupClosed -= HideInventory;
         }
 
-        private void ShowInventoryAtCell(Vector2Int cellPosition)
+        private void ShowInventoryAtCell(Cell cell)
         {
 
+            var cellPosition = cell.Position;
             _currentCellPosition = cellPosition;
 
             // Dünya koordinatlarını ekran koordinatlarına çevir

@@ -1,5 +1,6 @@
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using UnityEngine.Serialization;
 using WibeSoft.Core.Singleton;
 using WibeSoft.Core.Bootstrap;
 using WibeSoft.Data.Models;
@@ -31,7 +32,7 @@ namespace WibeSoft.Core.Managers
         private LogManager _logger;
         private JsonDataService _jsonDataService;
         private Cell[,] _grid;
-        private Cell _selectedCell;
+         public Cell SelectedCell;
         private Camera _mainCamera;
         private bool _isSelectionEnabled = true;
 
@@ -195,7 +196,11 @@ namespace WibeSoft.Core.Managers
                         X = x,
                         Y = y,
                         Type = cell.Type.ToString(),
-                        State = cell.State.ToString()
+                        State = cell.State.ToString(),
+                        CropId = cell.CurrentCrop?.CropId,
+                        PlantedTime = cell.CurrentCrop?.PlantedTime ?? System.DateTime.MinValue,
+                        GrowthProgress = cell.CurrentCrop?.GrowthProgress ?? 0f,
+                        CropState = cell.CurrentCrop?.State.ToString(),
                     });
                 }
             }
@@ -206,6 +211,11 @@ namespace WibeSoft.Core.Managers
 
         private void HandleCellSelection()
         {
+            if (UIManager.Instance.IsPopupOpen)
+            {
+                _logger.LogInfo("Popup is open, cell selection disabled", "GridManager");
+                return;
+            }
             Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
@@ -225,32 +235,31 @@ namespace WibeSoft.Core.Managers
 
         public void SelectCell(Cell cell)
         {
-            if (_selectedCell == cell) return;
+            if (SelectedCell == cell) return;
 
             // Clear previous selection
             ClearSelection();
 
             // Set new selection
-            _selectedCell = cell;
-            _selectedCell.SetSelected(true);
+            SelectedCell = cell;
+            SelectedCell.SetSelected(true);
 
-            GameEvents.TriggerCellSelected(new Vector2Int(cell.X, cell.Y));
-            _logger.LogInfo($"Cell selected at ({cell.X}, {cell.Y})", "GridManager");
+            GameEvents.TriggerCellSelected(cell);
         }
 
         public void ClearSelection()
         {
-            if (_selectedCell != null)
+            if (SelectedCell != null)
             {
-                _selectedCell.SetSelected(false);
-                _selectedCell = null;
+                SelectedCell.SetSelected(false);
+                SelectedCell = null;
                 _logger.LogInfo("Cell selection cleared", "GridManager");
             }
         }
 
         public Cell GetSelectedCell()
         {
-            return _selectedCell;
+            return SelectedCell;
         }
 
         public void EnableSelection()

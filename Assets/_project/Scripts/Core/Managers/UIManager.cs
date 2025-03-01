@@ -11,6 +11,7 @@ namespace WibeSoft.Core.Managers
         private Canvas _mainCanvas;
         private GameObject _currentPanel;
         private LogManager _logger => LogManager.Instance;
+        public bool IsPopupOpen;
 
         public async UniTask Initialize()
         {

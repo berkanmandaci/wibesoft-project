@@ -116,7 +116,7 @@ namespace WibeSoft.Core.Managers
             return true;
         }
 
-        private async UniTask SaveInventoryData()
+        public async UniTask SaveInventoryData()
         {
             var saveData = new InventorySaveData
             {
