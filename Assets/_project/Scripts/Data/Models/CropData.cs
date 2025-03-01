@@ -11,7 +11,7 @@ namespace WibeSoft.Data.Models
         public string CropId { get; private set; }
         public DateTime PlantedTime { get; private set; }
         
-        public int Step =>  GrowthProgress < 0.5f ? 0 : GrowthProgress < 1f ? 1 : 2;
+        public int Step =>  GrowthProgress < 0.5f ? 0 : GrowthProgress < 0.95f ? 1 : 2;
 
         public CropConfig GetCropConfig => _cropService.GetCropConfig(CropId);
 
