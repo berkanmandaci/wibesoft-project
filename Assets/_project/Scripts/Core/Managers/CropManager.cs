@@ -13,6 +13,7 @@ namespace WibeSoft.Core.Managers
     {
         private LogManager _logger => LogManager.Instance;
         private CropService _cropService => CropService.Instance;
+        private PlayerManager _playerManager => PlayerManager.Instance;
         private Dictionary<Vector2Int, UniTask> _growthTasks = new Dictionary<Vector2Int, UniTask>();
 
         public async UniTask Initialize()
@@ -50,11 +51,10 @@ namespace WibeSoft.Core.Managers
                 if (cropConfig == null) return;
 
                 int lastStage = -1;
-                while (cell.HasCrop && cell.CurrentCrop.State == CropState.Growing)
+                while (cell.HasCrop && cell.CurrentCrop.GetCurrentState() == CropState.Growing)
                 {
-                    cell.CurrentCrop.UpdateGrowth();
 
-                    var stage = Mathf.FloorToInt(cell.CurrentCrop.GrowthProgress * (cropConfig.GrowthStages - 1));
+                    var stage = cell.CurrentCrop.Step;
                     if (stage != lastStage)
                     {
                         var cropObject = cell.transform.Find("CropMesh");
@@ -70,7 +70,7 @@ namespace WibeSoft.Core.Managers
                         lastStage = stage;
                     }
 
-                    if (cell.CurrentCrop.State == CropState.ReadyToHarvest)
+                    if (cell.CurrentCrop.GetCurrentState() == CropState.ReadyToHarvest)
                     {
                         cell.UpdateState(CellState.ReadyToHarvest);
                         GameEvents.TriggerCropStateChanged(cell.Position, "ReadyToHarvest");
@@ -100,8 +100,7 @@ namespace WibeSoft.Core.Managers
                     var cell = gridManager.GetCell(x, y);
                     if (cell != null && cell.HasCrop)
                     {
-                        cell.CurrentCrop.UpdateGrowth();
-                        if (cell.CurrentCrop.State == CropState.ReadyToHarvest)
+                        if (cell.CurrentCrop.GetCurrentState() == CropState.ReadyToHarvest)
                         {
                             cell.UpdateState(CellState.ReadyToHarvest);
                         }
@@ -114,13 +113,20 @@ namespace WibeSoft.Core.Managers
 
         public async UniTask HarvestCrop(Cell cell)
         {
-            if (!cell.HasCrop || cell.CurrentCrop.State != CropState.ReadyToHarvest)
+            if (!cell.HasCrop || cell.CurrentCrop.GetCurrentState() != CropState.ReadyToHarvest)
             {
                 _logger.LogWarning($"Cannot harvest: No ready crop at position {cell.Position}", "CropManager");
                 return;
             }
 
             var cropId = cell.CurrentCrop.CropId;
+            var cropConfig = _cropService.GetCropConfig(cropId);
+            
+            // Para ve exp ver
+            _playerManager.AddGold(cropConfig.SellPrice);
+            _playerManager.AddExperience(10);
+            
+            // Ekini temizle
             cell.ClearCrop();
 
             GameEvents.TriggerCropHarvested(cell.Position);

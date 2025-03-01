@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using WibeSoft.Features.Grid;
 
 namespace WibeSoft.Data.ScriptableObjects
 {
@@ -48,6 +50,7 @@ namespace WibeSoft.Data.ScriptableObjects
         public AudioClip PlantSound => _plantSound;
         public AudioClip GrowthSound => _growthSound;
         public AudioClip HarvestSound => _harvestSound;
+        
 
         private void OnValidate()
         {

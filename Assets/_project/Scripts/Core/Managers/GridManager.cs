@@ -5,6 +5,8 @@ using WibeSoft.Core.Singleton;
 using WibeSoft.Core.Bootstrap;
 using WibeSoft.Data.Models;
 using WibeSoft.Features.Grid;
+using System;
+using UnityEngine.EventSystems;
 
 namespace WibeSoft.Core.Managers
 {
@@ -16,6 +18,7 @@ namespace WibeSoft.Core.Managers
     {
         private const int GRID_SIZE = 10;
         private const float CELL_SPACING = 2f;
+        private const float CLICK_DELAY = 0.5f; // Tıklama gecikmesi (saniye)
 
         [Header("Prefab References")]
         [SerializeField] private GameObject _cellPrefab;
@@ -30,24 +33,37 @@ namespace WibeSoft.Core.Managers
         [SerializeField] private Material _cellMaterial;
 
         private LogManager _logger;
-        private JsonDataService _jsonDataService;
         private Cell[,] _grid;
          public Cell SelectedCell;
         private Camera _mainCamera;
         private bool _isSelectionEnabled = true;
+        private bool _canClick = true;
+        private DateTime _lastClickTime;
 
         private void Update()
         {
-            if (_isSelectionEnabled && Input.GetMouseButtonDown(0))
+            if (_isSelectionEnabled && Input.GetMouseButtonDown(0) && _canClick)
             {
-                HandleCellSelection();
+                var currentTime = DateTime.Now;
+                if ((currentTime - _lastClickTime).TotalSeconds >= CLICK_DELAY)
+                {
+                    _canClick = false;
+                    HandleCellSelection();
+                    _lastClickTime = currentTime;
+                    EnableClickAfterDelay().Forget();
+                }
             }
+        }
+
+        private async UniTask EnableClickAfterDelay()
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(CLICK_DELAY));
+            _canClick = true;
         }
 
         public async UniTask Initialize()
         {
             _logger = LogManager.Instance;
-            _jsonDataService = JsonDataService.Instance;
             _mainCamera = Camera.main;
 
             _logger.LogInfo("Initializing GridManager", "GridManager");
@@ -56,7 +72,7 @@ namespace WibeSoft.Core.Managers
             await CreateGridContainer();
             
             // Önce JSON verilerini yükle
-            var gridData = _jsonDataService.GetGridData();
+            var gridData = PlayerPrefsDataService.Instance.GetGridData();
             await CreateGrid(gridData);
 
             _logger.LogInfo("GridManager initialized successfully", "GridManager");
@@ -200,22 +216,22 @@ namespace WibeSoft.Core.Managers
                         CropId = cell.CurrentCrop?.CropId,
                         PlantedTime = cell.CurrentCrop?.PlantedTime ?? System.DateTime.MinValue,
                         GrowthProgress = cell.CurrentCrop?.GrowthProgress ?? 0f,
-                        CropState = cell.CurrentCrop?.State.ToString(),
+                        CropState = cell.CurrentCrop?.GetCurrentState().ToString(),
                     });
                 }
             }
 
-            await _jsonDataService.SaveGridData(gridData);
+            await PlayerPrefsDataService.Instance.SaveGridData(gridData);
             _logger.LogInfo("Grid data saved successfully", "GridManager");
         }
 
         private void HandleCellSelection()
         {
-            if (UIManager.Instance.IsPopupOpen)
-            {
-                _logger.LogInfo("Popup is open, cell selection disabled", "GridManager");
+            if (EventSystem.current.IsPointerOverGameObject())
                 return;
-            }
+            
+            GameEvents.TriggerClosePopup();
+            
             Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
@@ -265,12 +281,14 @@ namespace WibeSoft.Core.Managers
         public void EnableSelection()
         {
             _isSelectionEnabled = true;
+            _canClick = true;
             _logger.LogInfo("Cell selection enabled", "GridManager");
         }
 
         public void DisableSelection()
         {
             _isSelectionEnabled = false;
+            _canClick = false;
             ClearSelection();
             _logger.LogInfo("Cell selection disabled", "GridManager");
         }

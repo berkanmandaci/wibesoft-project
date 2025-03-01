@@ -63,19 +63,14 @@ namespace WibeSoft.UI.Controllers.InventoryControllers
 
         private void ShowInventoryAtCell(Cell cell)
         {
-
-            var cellPosition = cell.Position;
-            _currentCellPosition = cellPosition;
-
-            // Dünya koordinatlarını ekran koordinatlarına çevir
-            Vector3 worldPosition = new Vector3(cellPosition.x * 2f, 0, cellPosition.y * 2f); // Grid spacing'e göre ayarla
-            Vector3 screenPosition = _mainCamera.WorldToScreenPoint(worldPosition);
-
+           
+       
             // Envanter panelini konumlandır
-            _itemContainer.position = new Vector3(screenPosition.x, screenPosition.y + _yOffset, 0);
+            _itemContainer.position =  cell.GetScreenPosition();
+            
             _itemContainer.gameObject.SetActive(true);
             GameEvents.TriggerOpenPopup();
-            _logger.LogInfo($"Showing inventory at cell: {cellPosition}", "InventoryController");
+            _logger.LogInfo($"Showing inventory at cell: {cell.Position}", "InventoryController");
             RefreshInventory();
         }
 

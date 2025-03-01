@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using WibeSoft.Core.Managers;
+using WibeSoft.Data.ScriptableObjects;
 
 namespace WibeSoft.Data.Models
 {
@@ -9,8 +10,21 @@ namespace WibeSoft.Data.Models
     {
         public string CropId { get; private set; }
         public DateTime PlantedTime { get; private set; }
-        public float GrowthProgress { get; private set; }
-        public CropState State { get; private set; }
+        
+        public int Step =>  GrowthProgress < 0.5f ? 0 : GrowthProgress < 1f ? 1 : 2;
+
+        public CropConfig GetCropConfig => _cropService.GetCropConfig(CropId);
+
+        public float ElapsedTime => (float)(DateTime.Now - PlantedTime).TotalSeconds;
+        public float GrowthProgress => ElapsedTime / GrowthTime;
+        
+        public float GrowthTime => GetCropConfig.GrowthTime;
+        
+        public CropState GetCurrentState()
+        {
+            return ElapsedTime < GrowthTime ? CropState.Growing : CropState.ReadyToHarvest;
+        }
+
 
         private LogManager _logger => LogManager.Instance;
         private CropService _cropService => CropService.Instance;
@@ -19,32 +33,14 @@ namespace WibeSoft.Data.Models
         {
             CropId = cropId;
             PlantedTime = DateTime.Now;
-            GrowthProgress = 0f;
-            State = CropState.Growing;
-            
             _logger.LogInfo($"New crop created: {cropId}", "CropData");
         }
 
-        public void UpdateGrowth()
-        {
-            var cropConfig = _cropService.GetCropConfig(CropId);
-            if (cropConfig == null) return;
+      
 
-            var elapsedTime = (float)(DateTime.Now - PlantedTime).TotalSeconds;
-            GrowthProgress = Mathf.Clamp01(elapsedTime / cropConfig.GrowthTime);
-
-            if (GrowthProgress >= 1f && State == CropState.Growing)
-            {
-                State = CropState.ReadyToHarvest;
-                _logger.LogInfo($"Crop ready to harvest: {CropId}", "CropData");
-            }
-        }
-
-        public void UpdateFromSaveData(DateTime plantedTime, float progress, CropState state)
+        public void UpdateFromSaveData(DateTime plantedTime)
         {
             PlantedTime = plantedTime;
-            GrowthProgress = progress;
-            State = state;
         }
     }
 
@@ -52,6 +48,5 @@ namespace WibeSoft.Data.Models
     {
         Growing,
         ReadyToHarvest,
-        Dead
     }
-} 
+}

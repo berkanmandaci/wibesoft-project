@@ -11,7 +11,7 @@ namespace WibeSoft.Core.Managers
     {
         private Dictionary<string, InventoryItem> _inventory = new Dictionary<string, InventoryItem>();
         private LogManager _logger => LogManager.Instance;
-        private JsonDataService _jsonDataService => JsonDataService.Instance;
+        private PlayerPrefsDataService _playerPrefsDataService => PlayerPrefsDataService.Instance;
 
         public event System.Action<string, InventoryItem> OnItemUpdated;
         public event System.Action<string> OnItemRemoved;
@@ -23,7 +23,7 @@ namespace WibeSoft.Core.Managers
             _logger.LogInfo("Initializing InventoryManager", "InventoryManager");
             
             // Load inventory data from JSON
-            var saveData = _jsonDataService.GetInventoryData();
+            var saveData = _playerPrefsDataService.GetInventoryData();
             if (saveData != null && saveData.Items != null)
             {
                 await LoadData(saveData.Items);
@@ -132,7 +132,7 @@ namespace WibeSoft.Core.Managers
                 };
             }
 
-            await _jsonDataService.SaveInventoryData(saveData);
+            await _playerPrefsDataService.SaveInventoryData(saveData);
             _logger.LogInfo("Inventory data saved", "InventoryManager");
         }
 

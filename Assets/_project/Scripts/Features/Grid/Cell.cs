@@ -14,7 +14,7 @@ namespace WibeSoft.Features.Grid
     {
         [SerializeField] private MeshFilter _meshFilter;
         [SerializeField] private MeshRenderer _meshRenderer;
-        
+
         private Material _defaultMaterial;
         private Material _selectedMaterial;
         private Mesh _waterMesh;
@@ -24,7 +24,7 @@ namespace WibeSoft.Features.Grid
         private Outline _outline;
         private CropData _currentCrop;
         private GameObject _cropObject;
-        
+
         private LogManager _logger => LogManager.Instance;
 
         public int X { get; private set; }
@@ -52,27 +52,31 @@ namespace WibeSoft.Features.Grid
                 _outline = gameObject.AddComponent<Outline>();
                 _outline.enabled = false;
             }
-          
+
         }
 
         public void SetSelected(bool selected)
         {
+            SetDefaultColor();
             if (selected == _isSelected) return;
-            
+
             _isSelected = selected;
             _outline.enabled = selected;
-            
+
             if (selected)
             {
-                if (Type == CellType.Farm&& State == CellState.Empty)
+                if (Type == CellType.Farm && State == CellState.Empty)
                 {
                     GameEvents.TriggerPlantingRequested(this);
-                }else if (Type == CellType.Farm && State == CellState.Growing)
+                }
+                else if (Type == CellType.Farm && CurrentCrop.GetCurrentState() == CropState.Growing)
                 {
                     GameEvents.TriggerCropInfoPopup(this);
-                }else if (Type == CellType.Farm && State == CellState.ReadyToHarvest)
+                }
+                else if (Type == CellType.Farm && CurrentCrop.GetCurrentState() == CropState.ReadyToHarvest)
                 {
-                    GameEvents.TriggerHarvestPopup(this);
+                    CropManager.Instance.HarvestCrop(this).Forget();
+                    // GameEvents.TriggerHarvestPopup(this);
                 }
                 GameEvents.TriggerCellSelected(this);
                 _logger.LogInfo($"Cell selected at position: {Position}", "Cell");
@@ -83,13 +87,17 @@ namespace WibeSoft.Features.Grid
             _outline.enabled = show;
             HighlightCell(show);
         }
-        
+
         private void HighlightCell(bool show)
         {
             _outline.enabled = show;
             _outline.OutlineColor = Color.green;
         }
-        
+
+        private void SetDefaultColor()
+        {
+            _outline.OutlineColor = Color.green;
+        }
         public void ShowInvalidPlanting(bool show)
         {
             _outline.enabled = show;
@@ -121,7 +129,7 @@ namespace WibeSoft.Features.Grid
             }
 
             // Set mesh based on type
-            switch (Type)
+            switch ( Type )
             {
                 case CellType.Water:
                     _meshFilter.mesh = _waterMesh;
@@ -170,13 +178,13 @@ namespace WibeSoft.Features.Grid
                     _currentCrop = new CropData(data.CropId);
                     if (System.Enum.TryParse(data.CropState, out CropState cropState))
                     {
-                        _currentCrop.UpdateFromSaveData(data.PlantedTime, data.GrowthProgress, cropState);
+                        _currentCrop.UpdateFromSaveData(data.PlantedTime);
                     }
                     SetCrop(_currentCrop);
                 }
 
                 await SetupComponents();
-              
+
                 _logger.LogInfo($"Cell loaded from data at position: ({X}, {Y})", "Cell");
             }
             catch (System.Exception ex)
@@ -221,22 +229,22 @@ namespace WibeSoft.Features.Grid
         {
             _currentCrop = cropData;
             UpdateState(CellState.Growing);
-            
+
             // Ekin mesh'ini oluştur
             if (_cropObject == null)
             {
                 _cropObject = new GameObject("CropMesh");
                 _cropObject.transform.SetParent(transform);
                 _cropObject.transform.localPosition = Vector3.up * 2f; // Hücrenin üstüne yerleştir
-                
+
                 var meshFilter = _cropObject.AddComponent<MeshFilter>();
                 var meshRenderer = _cropObject.AddComponent<MeshRenderer>();
-                
+                var stage = Mathf.FloorToInt(CurrentCrop.GrowthProgress * (CropService.Instance.GetCropConfig(cropData.CropId).GrowthStages - 1));
                 // CropService'den mesh ve materyal al
-                meshFilter.mesh = CropService.Instance.GetGrowthStageMesh(cropData.CropId, 0);
+                meshFilter.mesh = CropService.Instance.GetGrowthStageMesh(cropData.CropId, stage);
                 meshRenderer.material = CropService.Instance.GetCropMaterial(cropData.CropId);
             }
-            
+
             _logger.LogInfo($"Crop set at position ({X}, {Y}): {cropData.CropId}", "Cell");
         }
 
@@ -250,6 +258,18 @@ namespace WibeSoft.Features.Grid
             _currentCrop = null;
             UpdateState(CellState.Empty);
             _logger.LogInfo($"Crop cleared at position ({X}, {Y})", "Cell");
+        }
+
+        private float _yOffset = 800f;
+
+        public Vector2 GetScreenPosition()
+        {
+            var cellPosition = Position;
+
+            // Dünya koordinatlarını ekran koordinatlarına çevir
+            Vector3 worldPosition = new Vector3(cellPosition.x * 2f, 0, cellPosition.y * 2f); // Grid spacing'e göre ayarla
+            Vector3 screenPosition = Camera.main.WorldToScreenPoint(worldPosition);
+            return new Vector2(screenPosition.x, screenPosition.y + _yOffset);
         }
     }
 
@@ -266,4 +286,4 @@ namespace WibeSoft.Features.Grid
         Growing,
         ReadyToHarvest
     }
-} 
+}

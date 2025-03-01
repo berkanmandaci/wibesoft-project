@@ -18,7 +18,7 @@ namespace WibeSoft.Core.Managers
             _logger = LogManager.Instance;
             _logger.LogInfo("Initializing PlayerManager", "PlayerManager");
 
-            var playerData = JsonDataService.Instance.GetPlayerData();
+            var playerData = PlayerPrefsDataService.Instance.GetPlayerData();
             PlayerData = new PlayerData(
                 playerData.MaxExp,
                 playerData.CurrentExp,
@@ -107,9 +107,9 @@ namespace WibeSoft.Core.Managers
                 GameEvents.TriggerCurrencyChanged(PlayerData.Currency.Gold, PlayerData.Currency.Gem);
                 
                 // Save the changes
-                var saveData = JsonDataService.Instance.GetPlayerData();
+                var saveData = PlayerPrefsDataService.Instance.GetPlayerData();
                 saveData.Gold = PlayerData.Currency.Gold;
-                JsonDataService.Instance.SavePlayerData(saveData).Forget();
+                PlayerPrefsDataService.Instance.SavePlayerData(saveData).Forget();
             }
         }
 
@@ -121,9 +121,9 @@ namespace WibeSoft.Core.Managers
                 GameEvents.TriggerCurrencyChanged(PlayerData.Currency.Gold, PlayerData.Currency.Gem);
                 
                 // Save the changes
-                var saveData = JsonDataService.Instance.GetPlayerData();
+                var saveData = PlayerPrefsDataService.Instance.GetPlayerData();
                 saveData.Gold = PlayerData.Currency.Gold;
-                JsonDataService.Instance.SavePlayerData(saveData).Forget();
+                PlayerPrefsDataService.Instance.SavePlayerData(saveData).Forget();
             }
         }
 
@@ -135,9 +135,9 @@ namespace WibeSoft.Core.Managers
                 GameEvents.TriggerCurrencyChanged(PlayerData.Currency.Gold, PlayerData.Currency.Gem);
                 
                 // Save the changes
-                var saveData = JsonDataService.Instance.GetPlayerData();
+                var saveData = PlayerPrefsDataService.Instance.GetPlayerData();
                 saveData.Gem = PlayerData.Currency.Gem;
-                JsonDataService.Instance.SavePlayerData(saveData).Forget();
+                PlayerPrefsDataService.Instance.SavePlayerData(saveData).Forget();
             }
         }
 
@@ -149,15 +149,15 @@ namespace WibeSoft.Core.Managers
                 GameEvents.TriggerCurrencyChanged(PlayerData.Currency.Gold, PlayerData.Currency.Gem);
                 
                 // Save the changes
-                var saveData = JsonDataService.Instance.GetPlayerData();
+                var saveData = PlayerPrefsDataService.Instance.GetPlayerData();
                 saveData.Gem = PlayerData.Currency.Gem;
-                JsonDataService.Instance.SavePlayerData(saveData).Forget();
+                PlayerPrefsDataService.Instance.SavePlayerData(saveData).Forget();
             }
         }
-        public async Task SavePlayerData()
+        public async UniTask SavePlayerData()
         {
-            var saveData = JsonDataService.Instance.GetPlayerData();
-            JsonDataService.Instance.SavePlayerData(saveData).Forget();
+            var saveData = PlayerPrefsDataService.Instance.GetPlayerData();
+            PlayerPrefsDataService.Instance.SavePlayerData(saveData).Forget();
         }
     }
 } 

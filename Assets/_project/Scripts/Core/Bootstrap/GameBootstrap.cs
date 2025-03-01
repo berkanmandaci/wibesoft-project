@@ -109,17 +109,9 @@ namespace WibeSoft.Core.Bootstrap
             {
                 _logger.LogInfo("Initializing core systems...", "Bootstrap");
 
-                // TimeManager
-                await TimeManager.Instance.Initialize();
 
-                // PoolManager
-                await PoolManager.Instance.Initialize();
+                await PlayerPrefsDataService.Instance.Initialize();
 
-                // JsonDataService
-                await JsonDataService.Instance.Initialize();
-
-                // AudioManager
-                var audioManager = AudioManager.Instance;
 
                 // PlayerManager
                 await PlayerManager.Instance.Initialize();
@@ -139,9 +131,6 @@ namespace WibeSoft.Core.Bootstrap
 
             try
             {
-                // JsonDataService initialization
-                await JsonDataService.Instance.Initialize();
-
                 // ScriptableObject configs
                 await LoadConfigurations();
 
