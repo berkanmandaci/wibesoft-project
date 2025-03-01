@@ -123,9 +123,9 @@ Assets/_Project/
 
 ## 📸 Oyun Görselleri
 
-![Oyun Ekranı](Assets/_Project/Art/Screenshots/gameplay.png)
-![Envanter](Assets/_Project/Art/Screenshots/inventory.png)
-![Ekin Sistemi](Assets/_Project/Art/Screenshots/farming.png)
+![Oyun Ekranı](Assets/_project/Art/Screenshots/gameplay.png)
+![Envanter](Assets/_project/Art/Screenshots/inventory.png)
+![Ekin Sistemi](Assets/_project/Art/Screenshots/farming.png)
 
 ## 📦 Kullanılan Assetler
 
@@ -135,19 +135,14 @@ Assets/_Project/
    - Version: 2.3.3
    - [GitHub](https://github.com/Cysharp/UniTask)
 
-2. **DOTween**
-   - Animasyonlar için
-   - Version: 1.2.7
-   - [Asset Store](https://assetstore.unity.com/packages/tools/animation/dotween-hotween-v2-27676)
+2. **GameDev Starter Kit - Farming**
+   - Modeller
+   - Version: 1.0.0
+   - [Asset Store](https://assetstore.unity.com/packages/3d/environments/gamedev-starter-kit-farming-free-edition-243035)
 
 3. **Quick Outline**
    - Obje seçim efektleri için
    - Version: 1.0.3
    - [Asset Store](https://assetstore.unity.com/packages/tools/particles-effects/quick-outline-115488)
 
-## 📝 Geliştici Notları
-
-- Tüm geliştirmeler `Assets/_Project` altında yapılmalıdır
-- Kod yazım kuralları için `Document/CodingGuidelines.md` dosyasına bakın
-- Mimari detaylar için `Document/Architecture.md` dosyasına bakın
 
