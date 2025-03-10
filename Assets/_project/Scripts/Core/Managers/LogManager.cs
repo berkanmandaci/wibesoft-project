@@ -8,7 +8,7 @@ namespace WibeSoft.Core.Managers
     /// <summary>
     /// Manages centralized logging functionality for the game
     /// </summary>
-    public class LogManager : SingletonBehaviour<LogManager>
+    public class LogManager : Singleton<LogManager>
     {
         private const int MAX_LOG_HISTORY = 1000;
         private readonly Queue<LogEntry> _logHistory = new Queue<LogEntry>();

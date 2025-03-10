@@ -1,13 +1,11 @@
 using UnityEngine;
-using Cysharp.Threading.Tasks;
-using WibeSoft.Core.Singleton;
 using WibeSoft.Core.Managers;
 using WibeSoft.Core.Bootstrap;
 using UnityEngine.UI;
 
 namespace WibeSoft.Features.Grid
 {
-    public class GridInteractionController : SingletonBehaviour<GridInteractionController>
+    public class GridInteractionController : MonoBehaviour
     {
         [Header("References")]
         [SerializeField] private LayerMask _gridLayer;

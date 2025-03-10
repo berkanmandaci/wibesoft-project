@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace WibeSoft.Core.Managers
 {
-    public class InventoryManager : SingletonBehaviour<InventoryManager>
+    public class InventoryManager : Singleton<InventoryManager>
     {
         private Dictionary<string, InventoryItem> _inventory = new Dictionary<string, InventoryItem>();
         private LogManager _logger => LogManager.Instance;

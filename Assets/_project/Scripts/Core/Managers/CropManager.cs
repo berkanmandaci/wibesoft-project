@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace WibeSoft.Core.Managers
 {
-    public class CropManager : SingletonBehaviour<CropManager>
+    public class CropManager : Singleton<CropManager>
     {
         private LogManager _logger => LogManager.Instance;
         private CropService _cropService => CropService.Instance;
@@ -51,7 +51,7 @@ namespace WibeSoft.Core.Managers
                 if (cropConfig == null) return;
 
                 int lastStage = -1;
-                while (cell.HasCrop && cell.CurrentCrop.GetCurrentState() == CropState.Growing)
+                while (cell.HasCrop && (cell.CurrentCrop.GetCurrentState() == CropState.Growing || cell.CurrentCrop.GetCurrentState() == CropState.ReadyToHarvest ))
                 {
 
                     var stage = cell.CurrentCrop.Step;
@@ -72,7 +72,6 @@ namespace WibeSoft.Core.Managers
 
                     if (cell.CurrentCrop.GetCurrentState() == CropState.ReadyToHarvest)
                     {
-                        cell.UpdateState(CellState.ReadyToHarvest);
                         GameEvents.TriggerCropStateChanged(cell.Position, "ReadyToHarvest");
                         break;
                     }
@@ -90,26 +89,6 @@ namespace WibeSoft.Core.Managers
             }
         }
 
-        public void ProcessOfflineGrowth(TimeSpan offlineTime)
-        {
-            var gridManager = GridManager.Instance;
-            for (int x = 0; x < 10; x++)
-            {
-                for (int y = 0; y < 10; y++)
-                {
-                    var cell = gridManager.GetCell(x, y);
-                    if (cell != null && cell.HasCrop)
-                    {
-                        if (cell.CurrentCrop.GetCurrentState() == CropState.ReadyToHarvest)
-                        {
-                            cell.UpdateState(CellState.ReadyToHarvest);
-                        }
-                    }
-                }
-            }
-
-            _logger.LogInfo($"Processed offline growth for duration: {offlineTime.TotalHours:F1} hours", "CropManager");
-        }
 
         public async UniTask HarvestCrop(Cell cell)
         {

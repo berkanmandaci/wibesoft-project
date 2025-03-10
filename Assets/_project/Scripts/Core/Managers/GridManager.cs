@@ -18,7 +18,7 @@ namespace WibeSoft.Core.Managers
     {
         private const int GRID_SIZE = 10;
         private const float CELL_SPACING = 2f;
-        private const float CLICK_DELAY = 0.5f; // Tıklama gecikmesi (saniye)
+        private const float CLICK_DELAY = 0.1f; // Tıklama gecikmesi (saniye)
 
         [Header("Prefab References")]
         [SerializeField] private GameObject _cellPrefab;
@@ -162,7 +162,7 @@ namespace WibeSoft.Core.Managers
         {
             float xPos = (x - (GRID_SIZE - 1) / 2f) * CELL_SPACING;
             float zPos = (y - (GRID_SIZE - 1) / 2f) * CELL_SPACING;
-            return new Vector3(xPos, 0f, zPos);
+            return new Vector3(xPos, 1.95f, zPos);
         }
 
         private async UniTask<Cell> CreateCell(Vector3 position, int x, int y)

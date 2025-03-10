@@ -30,7 +30,7 @@ namespace WibeSoft.Features.Grid
         public int X { get; private set; }
         public int Y { get; private set; }
         public CellType Type { get; private set; }
-        public CellState State { get; private set; }
+        public CellState State => _currentCrop == null ? CellState.Empty : _currentCrop.GetCurrentState() == CropState.Growing ? CellState.Growing : CellState.ReadyToHarvest;
         public bool IsSelected => _isSelected;
         public Vector2Int Position { get; private set; }
         public CropData CurrentCrop => _currentCrop;
@@ -114,7 +114,6 @@ namespace WibeSoft.Features.Grid
             _groundMesh = groundMesh;
             _farmMesh = farmMesh;
             Type = type;
-            State = CellState.Empty;
 
             await SetupComponents();
             _logger.LogInfo($"Cell initialized at position: ({X}, {Y})", "Cell");
@@ -161,16 +160,7 @@ namespace WibeSoft.Features.Grid
                     Type = CellType.Ground;
                 }
 
-                // Parse and set state
-                if (System.Enum.TryParse(data.State, out CellState parsedState))
-                {
-                    State = parsedState;
-                }
-                else
-                {
-                    _logger.LogError($"Invalid cell state in save data: {data.State}", "Cell");
-                    State = CellState.Empty;
-                }
+
 
                 // Load crop data if exists
                 if (!string.IsNullOrEmpty(data.CropId))
@@ -218,17 +208,11 @@ namespace WibeSoft.Features.Grid
             _logger.LogInfo($"Cell switched to Farm at position: ({X}, {Y})", "Cell");
         }
 
-        public void UpdateState(CellState newState)
-        {
-            State = newState;
-            _logger.LogInfo($"Cell state updated to {newState} at position: ({X}, {Y})", "Cell");
-            GameEvents.TriggerCropStateChanged(Position, newState.ToString());
-        }
+
 
         public void SetCrop(CropData cropData)
         {
             _currentCrop = cropData;
-            UpdateState(CellState.Growing);
 
             // Ekin mesh'ini oluştur
             if (_cropObject == null)
@@ -256,7 +240,6 @@ namespace WibeSoft.Features.Grid
                 _cropObject = null;
             }
             _currentCrop = null;
-            UpdateState(CellState.Empty);
             _logger.LogInfo($"Crop cleared at position ({X}, {Y})", "Cell");
         }
 

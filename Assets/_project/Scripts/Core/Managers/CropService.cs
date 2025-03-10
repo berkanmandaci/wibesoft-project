@@ -5,7 +5,7 @@ using WibeSoft.Data.ScriptableObjects;
 
 namespace WibeSoft.Core.Managers
 {
-    public class CropService : SingletonBehaviour<CropService>
+    public class CropService : Singleton<CropService>
     {
         private CropDatabase _database;
         private LogManager _logger => LogManager.Instance;

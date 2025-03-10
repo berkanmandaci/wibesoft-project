@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace WibeSoft.Core.Managers
 {
-    public class PlayerPrefsDataService : SingletonBehaviour<PlayerPrefsDataService>
+    public class PlayerPrefsDataService : Singleton<PlayerPrefsDataService>
     {
         private const string PLAYER_DATA_KEY = "player_data";
         private const string GRID_DATA_KEY = "grid_data";
@@ -23,6 +23,7 @@ namespace WibeSoft.Core.Managers
         {
             _logger.LogInfo("PlayerPrefsDataService başlatılıyor", "PlayerPrefsDataService");
             await LoadData();
+            SaveToPlayerPrefs();
         }
 
         public SaveData GetAllData()
@@ -143,15 +144,28 @@ namespace WibeSoft.Core.Managers
             int centerY = 10 / 2;
             
             // 10x10 boyutunda grid oluştur
+            
+            
             for (int x = 0; x < 10; x++)
             {
                 for (int y = 0; y < 10; y++)
                 {
-                    var cell = new CellSaveData
+                    
+                    var randomCellIndex= UnityEngine.Random.Range(0, 2);
+                    
+                    var cellTypeString= randomCellIndex switch
+                    {
+                        0 => "Ground",
+                        1 => "Water",
+                        2 => "Farm",
+                        _ => "Ground"
+                    };
+                    
+                    var cell = new CellSaveData()
                     {
                         X = x,
                         Y = y,
-                        Type = "Ground",
+                        Type = cellTypeString,
                         State = "Empty"
                     };
                     
@@ -170,9 +184,8 @@ namespace WibeSoft.Core.Managers
             var inventoryItems = new Dictionary<string, InventoryItemSaveData>
             {
                 ["Carrot"] = new InventoryItemSaveData { Amount = 10, Value = 100 },
-                ["Corn"] = new InventoryItemSaveData { Amount = 10, Value = 150 }
+                ["Corn"] = new InventoryItemSaveData { Amount = 10, Value = 150 },
             };
-
             return new SaveData
             {
                 PlayerData = new PlayerSaveData

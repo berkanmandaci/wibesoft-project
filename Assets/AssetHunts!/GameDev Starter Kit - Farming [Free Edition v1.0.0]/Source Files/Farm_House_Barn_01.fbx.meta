@@ -1,5 +1,13 @@
 fileFormatVersion: 2
 guid: 9898b7f56f18a2c41946031f3080fcc0
+AssetOrigin:
+  serializedVersion: 1
+  productId: 243035
+  packageName: 'GameDev Starter Kit - Farming [Free Edition]'
+  packageVersion: v1.0.0
+  assetPath: Assets/AssetHunts!/GameDev Starter Kit - Farming [Free Edition v1.0.0]/Source
+    Files/Farm_House_Barn_01.fbx
+  uploadId: 704897
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -16,8 +24,6 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -32,7 +38,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages: []
     globalScale: 1
@@ -107,11 +113,3 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 243035
-  packageName: 'GameDev Starter Kit - Farming [Free Edition]'
-  packageVersion: v1.0.0
-  assetPath: Assets/AssetHunts!/GameDev Starter Kit - Farming [Free Edition v1.0.0]/Source
-    Files/Farm_House_Barn_01.fbx
-  uploadId: 704897

@@ -7,7 +7,7 @@ using WibeSoft.Core.Bootstrap;
 
 namespace WibeSoft.Core.Managers
 {
-    public class PlayerManager : SingletonBehaviour<PlayerManager>
+    public class PlayerManager : Singleton<PlayerManager>
     {
         private LogManager _logger;
         public PlayerData PlayerData;

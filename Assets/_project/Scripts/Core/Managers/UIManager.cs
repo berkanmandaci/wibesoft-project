@@ -1,7 +1,6 @@
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using WibeSoft.Core.Singleton;
-using WibeSoft.UI.Controllers;
 using WibeSoft.UI.Controllers.HudControllers;
 
 namespace WibeSoft.Core.Managers

@@ -103,13 +103,15 @@ namespace WibeSoft.Features.Dragging
             return true;
         }
 
+        private Cell _lastCenterCell;
         private void UpdateHighlight()
         {
-            ClearHighlights();
+          
 
             var centerCell = GetCenterCell();
-            if (centerCell == null) return;
-
+            if (centerCell == null|| centerCell== _lastCenterCell) return;
+         
+            ClearHighlights();
             int startX = centerCell.X - (_size.x / 2);
             int startY = centerCell.Y - (_size.y / 2);
 
@@ -144,6 +146,7 @@ namespace WibeSoft.Features.Dragging
                 }
                 _lastHighlightedCells.Add(cell);
             }
+            _lastCenterCell = centerCell;
         }
 
         private void ClearHighlights()
@@ -157,11 +160,6 @@ namespace WibeSoft.Features.Dragging
                 }
             }
             _lastHighlightedCells.Clear();
-        }
-
-        private void OnDestroy()
-        {
-            ClearHighlights();
         }
     }
 }
