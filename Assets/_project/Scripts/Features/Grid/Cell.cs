@@ -171,6 +171,7 @@ namespace WibeSoft.Features.Grid
                         _currentCrop.UpdateFromSaveData(data.PlantedTime);
                     }
                     SetCrop(_currentCrop);
+                    CropManager.Instance.StartGrowthTimer(this);
                 }
 
                 await SetupComponents();

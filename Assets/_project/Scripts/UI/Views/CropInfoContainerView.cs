@@ -63,13 +63,13 @@ namespace WibeSoft.UI.Views
                 return;
             }
 
-            var elapsedTime = (float)(DateTime.Now - _plantedTime).TotalSeconds;
-            
+
+
 
             _growthTime = cropConfig.GrowthTime;
 
             UpdateCropName(cropConfig.CropName);
-            UpdateGrowthProgress(elapsedTime, _growthTime);
+            UpdateGrowthProgress(_growthTime);
             UpdateRemainingTime();
 
         }
@@ -111,12 +111,14 @@ namespace WibeSoft.UI.Views
                 {
                     TimeSpan timeSpan = TimeSpan.FromSeconds(remainingTime);
                     _cropHarvestTimeText.text = $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
+                    UpdateGrowthProgress(_growthTime);
                 }
             }
         }
 
-        private void UpdateGrowthProgress(float progress, float maxGrowth)
+        private void UpdateGrowthProgress(float maxGrowth)
         {
+            var progress = (float)(DateTime.Now - _plantedTime).TotalSeconds;
             if (_cropGrowthSlider != null)
             {
                 _cropGrowthSlider.maxValue = maxGrowth;

@@ -33,7 +33,7 @@ namespace WibeSoft.Core.Managers
             GameEvents.TriggerCropPlanted(cell.Position, cropId);
         }
 
-        private void StartGrowthTimer(Cell cell)
+        public void StartGrowthTimer(Cell cell)
         {
             if (_growthTasks.ContainsKey(cell.Position))
             {
@@ -42,6 +42,7 @@ namespace WibeSoft.Core.Managers
 
             _growthTasks[cell.Position] = MonitorGrowth(cell);
         }
+
 
         private async UniTask MonitorGrowth(Cell cell)
         {
